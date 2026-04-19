@@ -1,0 +1,337 @@
+:root {
+  --bg-color: #0b0c10;
+  --grid-line-glow: rgba(100, 200, 255, 0.4);
+  --grid-line: rgba(100, 200, 255, 0.2);
+  --grid-line-thick: rgba(100, 200, 255, 0.6);
+  --cell-bg: rgba(20, 25, 40, 0.3);
+  --cell-bg-hover: rgba(50, 100, 180, 0.4);
+  --cell-bg-selected: rgba(80, 150, 250, 0.5);
+  --text-main: #e0f2fe;
+  --text-blue: #7dd3fc;
+  --primary-accent: #38bdf8;
+  --error-color: #f43f5e;
+  --success-color: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  height: 100vh;
+  overflow: hidden; /* Hide scrollbars for the immersive environment */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px; /* For 3d float effects */
+}
+
+/* Cosmic Background */
+.cosmos-background {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #111524 0%, #050608 100%);
+}
+
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: drift 30s infinite alternate ease-in-out;
+}
+.nebula-1 {
+  top: -10%; left: -10%;
+  width: 50vw; height: 50vw;
+  background: radial-gradient(circle, rgba(138,43,226,0.5) 0%, transparent 70%);
+}
+.nebula-2 {
+  bottom: -20%; right: -10%;
+  width: 60vw; height: 60vw;
+  background: radial-gradient(circle, rgba(0,191,255,0.3) 0%, transparent 70%);
+  animation-delay: -15s;
+}
+
+/* Faint stars, simplified using a static background image or box-shadow (we'll keep it simple CSS) */
+.stars, .stars2, .stars3 {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: transparent;
+}
+/* We will generate stars via JS or use a basic pattern. For brevity, a few static dots via radial gradient */
+.stars {
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 90px 40px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: twinkle 5s infinite forwards;
+  opacity: 0.6;
+}
+
+/* Game UI Layer */
+.game-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  animation: gentle-float 8s ease-in-out infinite;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo {
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.glow-text {
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.7), 0 0 20px rgba(56, 189, 248, 0.5);
+  background: linear-gradient(90deg, #e0f2fe, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.status-bar {
+  display: flex;
+  gap: 2rem;
+  font-weight: 300;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: var(--text-blue);
+  opacity: 0.8;
+}
+
+/* Level Selection */
+.level-panel {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.level-btn {
+  background: rgba(20, 25, 40, 0.4);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  color: var(--text-blue);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-family: inherit;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+.level-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(56, 189, 248, 0.2);
+}
+
+.level-btn.active {
+  background: rgba(56, 189, 248, 0.3);
+  border-color: var(--primary-accent);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+  text-shadow: 0 0 5px #fff;
+}
+
+/* Sudoku Board */
+.sudoku-board-wrapper {
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(15, 20, 35, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.15), 
+              inset 0 0 20px rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(100, 200, 255, 0.15);
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  width: min(90vw, 450px);
+  height: min(90vw, 450px);
+  gap: 1px;
+  background-color: var(--grid-line);
+  border: 2px solid var(--grid-line-thick);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 15px var(--grid-line-glow);
+}
+
+.cell {
+  background-color: var(--cell-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  user-select: none;
+  position: relative;
+}
+
+/* Thicker lines for 3x3 blocks */
+.cell:nth-child(3n) { border-right: 2px solid var(--grid-line-thick); }
+.cell:nth-child(9n) { border-right: none; }
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--grid-line-thick); }
+
+/* Interaction states */
+.cell:hover {
+  background-color: var(--cell-bg-hover);
+  box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.5);
+  transform: translateZ(5px);
+  z-index: 2;
+  text-shadow: 0 0 8px var(--primary-accent);
+}
+
+.cell.selected {
+  background-color: var(--cell-bg-selected);
+  box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.5);
+  transform: translateZ(10px) scale(1.05);
+  z-index: 3;
+}
+
+.cell.given {
+  color: var(--text-blue);
+  font-weight: 600;
+}
+
+/* Value text wrapper for anti-gravity float effect */
+.cell .value {
+  display: inline-block;
+  animation: gentle-drift 4s ease-in-out infinite alternate;
+}
+
+/* Animations for cell interactions */
+@keyframes correct-pulse {
+  0% { box-shadow: inset 0 0 0 rgba(16, 185, 129, 0); transform: scale(1); }
+  50% { box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.8); transform: scale(1.1); background-color: rgba(16, 185, 129, 0.2); }
+  100% { box-shadow: inset 0 0 5px rgba(16, 185, 129, 0.3); transform: scale(1); }
+}
+
+@keyframes incorrect-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); box-shadow: inset 0 0 15px rgba(244, 63, 94, 0.6); background-color: rgba(244, 63, 94, 0.2); text-shadow: 0 0 10px var(--error-color);}
+  40%, 80% { transform: translateX(5px); box-shadow: inset 0 0 15px rgba(244, 63, 94, 0.6); background-color: rgba(244, 63, 94, 0.2); text-shadow: 0 0 10px var(--error-color);}
+}
+
+.cell.animate-correct { animation: correct-pulse 0.8s ease-out forwards; }
+.cell.animate-incorrect { color: var(--error-color); animation: incorrect-shake 0.5s ease-in-out forwards; }
+
+/* Number Selection Panel */
+.number-panel-wrapper {
+  margin-top: 1rem;
+  padding: 10px;
+  border-radius: 20px;
+  background: rgba(10, 15, 25, 0.5);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.number-panel {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.num-btn, .action-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  background: rgba(30, 40, 60, 0.6);
+  color: #fff;
+  font-size: 1.2rem;
+  font-family: inherit;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.num-btn:hover, .action-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 8px 15px rgba(56, 189, 248, 0.3), 0 0 10px rgba(56, 189, 248, 0.5);
+  text-shadow: 0 0 8px var(--primary-accent);
+}
+
+.num-btn:active, .action-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.action-btn {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: var(--error-color);
+}
+.action-btn:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 8px 15px rgba(244, 63, 94, 0.3), 0 0 10px rgba(244, 63, 94, 0.5);
+  text-shadow: 0 0 8px var(--error-color);
+}
+
+
+/* Keyframes */
+@keyframes drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(3%, 4%) scale(1.05); }
+  100% { transform: translate(-2%, -3%) scale(0.95); }
+}
+
+@keyframes gentle-drift {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(0.5px, -1px); }
+  66% { transform: translate(-0.5px, 0.5px); }
+  100% { transform: translate(0px, 0.5px); }
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0) rotateX(2deg) rotateY(-2deg); }
+  50% { transform: translateY(-10px) rotateX(0deg) rotateY(2deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+/* Dynamic tilt effect via JS variables */
+.sudoku-board-wrapper {
+  transform: perspective(1000px) rotateX(var(--rot-x, 0deg)) rotateY(var(--rot-y, 0deg)) translateZ(0);
+}
